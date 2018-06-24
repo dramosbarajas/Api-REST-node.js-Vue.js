@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Task = require('../models/task')
 
-router.get('/task', async (req, res) => {
+router.get('/tasks', async (req, res) => {
     const tasks = await Task.find();
     res.json({
-        'status':202,
-        'msg':"Mensaje de prueba ruta Task",
+        'status':200,
         'tasks':tasks
     })
 })
