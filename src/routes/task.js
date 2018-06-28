@@ -31,7 +31,12 @@ router.get('/task/:id', async (req, res) => {
 })
 
 router.put('/task/:id', async (req, res) => {
-    await Task.findByIdAndUpdate(req.params.id, req.body);
+    console.log(req.body);
+    let updateTask = {
+        "title":req.body.title,
+        "description":req.body.description
+    }
+    await Task.findByIdAndUpdate(req.params.id, updateTask);
     res.json({
         'status':200,
         'msg':"Tarea Actualizada correctamente.",

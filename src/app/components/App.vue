@@ -10,6 +10,7 @@
                     <div class="card-body">
                         <form @submit.prevent="addTask">
                             <div class="form-group">
+                            <input type="hidden" id="id" v-model="task._id">
                                 <input type="text" 
                                        name="title" 
                                        id="title" 
@@ -43,8 +44,8 @@
                                 <p>{{task.description}}</p>
                                 <p>{{task._id}}</p>
                                 
-                                <button class="btn btn-warning btn-block" @click="updatedModified(task._id)">Modificar</button>
-                                <button class="btn btn-danger btn-block">Eliminar</button>   
+                                <button class="btn btn-warning btn-block" @click="getTask(task._id)">Modificar</button>
+                                <button class="btn btn-danger btn-block" @click="deletedTask(task._id)">Eliminar</button>   
                             </div>
                         </div>
                     </div>      
@@ -67,22 +68,28 @@ export default {
   data() {
     return {
       task: new Task(),
-      tasks: []
+      tasks: [],
     };
   },
   methods: {
     addTask() {
-      fetch("/api/task", {
-        method: "post",
-        body: JSON.stringify(this.task),
-        headers: {
-          Accept: "application/json",
-          "Content-type": "application/json"
+        if(this.task._id != null){
+            this.updatedTask(this.task)
+        }else {
+            
+            fetch("/api/task", {
+              method: "post",
+              body: JSON.stringify(this.task),
+              headers: {
+                "Accept": "application/json",
+                "Content-type": "application/json"
+              }
+            })
+              .then(res => res.json())
+              .then(data => console.log(data));
+              this.task = new Task();
+              this.getTasks();   
         }
-      })
-        .then(res => res.json())
-        .then(data => console.log(data));
-      this.task = new Task();
     },
     getTasks() {
       fetch("/api/tasks", {
@@ -93,9 +100,42 @@ export default {
           this.tasks = data;
         });
     },
-    updatedModified(id){
-        console.log(id);
+    getTask(id){
+        fetch ("api/task/" + id,{
+            method:"get"
+        })
+        .then(res => res.json())
+        .then(data => {
+          this.task = data.Tarea;
+        }); 
+    },
+    deletedModified(id){
+        console.log("deleted " + id);
+  },
+  updatedTask(task){
+        fetch ("api/task/" + task._id,{
+            method:"put",
+             body: JSON.stringify(task),
+              headers: {
+             "Accept": "application/json",
+            "Content-type": "application/json"
+              }
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Se ha modificado la tarea ");
+        }); 
+    },
+    deletedTask(id){
+        fetch ("api/task/" + id,{
+            method:"delete",
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Se ha eliminado la tarea");
+          this.getTasks();
+        }); 
     }
-  }
-};
+}
+}
 </script>
