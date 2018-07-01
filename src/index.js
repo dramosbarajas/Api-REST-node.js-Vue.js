@@ -22,5 +22,5 @@ mongoose.connect(`mongodb://localhost:${app.get('dbport')}/mevn-database`)
     .then(db => app.listen(app.get('port'), () => {
         console.log(`DB OK!! - Server on port ${app.get('port')}`);
     }))
-    .catch(err => console.log(`Ha ocurrido un error al conectar a la base de datos y arrancar el servidir ${err}`));
+    .catch(err => console.log(`Ha ocurrido un error al conectar a la base de datos y arrancar el servidor ${err}`));
 
