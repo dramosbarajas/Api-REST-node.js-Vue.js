@@ -1,59 +1,101 @@
 <template>
+    <v-app>
 <div>
-    <nav class="navbar navbar-light bg-light">
-        <a href="/" class="navbar-brand"> Aplicación Tareas </a>
-    </nav>
-    <div class="container">
-        <div class="row pt-5">
-            <div class="col-md-5">
-                <div class="card">      
-                    <div class="card-body">
-                        <form @submit.prevent="addTask">
-                            <div class="form-group">
-                            <input type="hidden" id="id" v-model="task._id">
-                                <input type="text" 
-                                       name="title" 
-                                       id="title" 
-                                       class="form-control" 
-                                       placeholder="Titulo de tarea"
-                                       v-model="task.title">
-                            </div>
-                            <div class="form-group">
-                                <textarea name="description" 
-                                          id="description" 
-                                          cols="30" rows="10" 
-                                          class="form-control" 
-                                          placeholder="Descripción de la tarea"
-                                          v-model="task.description"
-                                          ></textarea>
-                            </div>
-                            <button class="btn btn-primary btn-block"> Enviar </button>
-                        </form>
-                    </div>
-                </div>
+  <v-toolbar class="deep-purple lighten-2"> 
+    <v-toolbar-title class="title">Aplicación de Tareas</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <a href="https://github.com/dramosbarajas/Api-REST-node.js-Vue.js"><img class="logo" src="img/github.png" alt="Github"></a>
+  </v-toolbar>
+  <div>
+  <v-alert
+      v-model="alerts.alertSuccess"
+      dismissible
+      type="success"
+      transition="scale-transition"
+    >
+      Se ha creado una nueva tarea.
+    </v-alert>
+    <v-alert
+      v-model="alerts.alertError"
+      dismissible
+      type="error"
+      transition="scale-transition"
+    >
+      Ha ocurrido un error.
+    </v-alert>
+    <v-alert
+      v-model="alerts.alertUpdated"
+      dismissible
+      type="info"
+      transition="scale-transition"
+    >
+      Los datos han sido actualizados correctamente.
+    </v-alert>
+     <v-alert
+      v-model="alerts.alertDeleted"
+      dismissible
+      type="success"
+      transition="scale-transition"
+    >
+      La tarea ha sido eliminada correctamente.
+    </v-alert>
+  </div>
+   <v-container grid-list-md text-xs-center>
+    <v-layout row wrap>
+      <v-flex xs8 offset-xs2>
+          <v-form class="mt-3">
+        <h2>Formulario para inserción de tareas.</h2>
+        <input type="hidden" name="id" v-model="task._id">
+            <v-text-field 
+              name="title" 
+              id="title" 
+              v-model="task.title"
+              required
+              label="Título de la tarea">
+            ></v-text-field>
+             <v-textarea
+              id="description" 
+              v-model="task.description"
+              label="Descripción de la tarea"
+              required
+            ></v-textarea>      
+            <v-btn color="success" class="center" @click="addTask">Guardar Tarea</v-btn>
+          </v-form>
+      </v-flex>
+  </v-layout>
+  <v-layout row wrap>
+    <v-flex xs8 sm8 lg8 offset-xs2 offset-sm2 offset-lg2>         
+        <h2>Tareas</h2>
+    </v-flex>
+  </v-layout>
+    <v-layout row wrap>
+      <v-flex v-for="(task,index) in tasks" :key="index" xs12 sm6 lg4 offset-xs0 offset-sm0 offset-lg0 text-xs-left text-sm-left text-lg-left>
+          <v-card class="mt-5" height="100%">
+          <v-card-title>
+            <div height="100%">
+              <span class="grey--text">Tarea  {{index + 1}}</span><br>
+              <span>{{ task.title }}</span><br>
+              <span>{{ task.description }}</span><br>
             </div>
-            <div class="col-md-7">
-                <button class="btn btn-info btn block" @click="getTasks"> Pedir Tareas </button>
-                <div v-if="tasks">
-                    <div v-for="(task,index) in tasks.tasks" :key="index">
-                        <div class="card">
-                            <div class="card card-title">
-                                <h4 class="ml-10">{{index + 1}}-{{task.title}}</h4>    
-                            </div>
-                            <div class="card-body">
-                                <p>{{task.description}}</p>
-                                <p>{{task._id}}</p>
-                                
-                                <button class="btn btn-warning btn-block" @click="getTask(task._id)">Modificar</button>
-                                <button class="btn btn-danger btn-block" @click="deletedTask(task._id)">Eliminar</button>   
-                            </div>
-                        </div>
-                    </div>      
-                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+          </v-card-title>
+            <hr>
+          <v-card-actions>
+            <v-btn @click="getTask(task._id)"  color="primary" fab small dark>
+              <v-icon>edit</v-icon>
+            </v-btn>
+            <v-btn @click="deletedTask(task._id)" color="red" fab small dark>
+              <v-icon>delete</v-icon>
+            </v-btn>
+            <v-btn color="deep-purple lighten-2" fab small dark>
+              <v-icon>favorite</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
+  </div>
+</v-app>
 </template>
 
 <script>
@@ -63,13 +105,21 @@ class Task {
     this.description = description;
   }
 }
-
 export default {
   data() {
     return {
       task: new Task(),
       tasks: [],
+      alerts:{
+        alertSuccess:'',
+        alertError:'',
+        alertUpdated:'',
+        alertDeleted:'',
+      }
     };
+  },created: function () {
+    // `this` points to the vm instance
+   this.getTasks();
   },
   methods: {
     addTask() {
@@ -88,6 +138,10 @@ export default {
               .then(res => res.json())
               .then(data => console.log(data));
               this.task = new Task();
+              this.alerts.alertSuccess=true;
+              setTimeout(() => {
+                this.alerts.alertSuccess=false;
+              }, 2000);
               this.getTasks();   
         }
     },
@@ -97,7 +151,7 @@ export default {
       })
         .then(res => res.json())
         .then(data => {
-          this.tasks = data;
+          this.tasks = data.tasks;
         });
     },
     getTask(id){
@@ -106,6 +160,7 @@ export default {
         })
         .then(res => res.json())
         .then(data => {
+          window.scrollTo(0,0)
           this.task = data.Tarea;
         }); 
     },
@@ -124,6 +179,13 @@ export default {
         .then(res => res.json())
         .then(data => {
           console.log("Se ha modificado la tarea ");
+          this.task = new Task();
+          window.scrollTo(0,0)
+          this.alerts.alertUpdated=true;
+              setTimeout(() => {
+                this.alerts.alertUpdated=false;
+              }, 2000);
+          this.getTasks(); 
         }); 
     },
     deletedTask(id){
@@ -133,9 +195,19 @@ export default {
         .then(res => res.json())
         .then(data => {
           console.log("Se ha eliminado la tarea");
+          window.scrollTo(0,0)
+          this.alerts.alertDeleted=true;
+              setTimeout(() => {
+                this.alerts.alertDeleted=false;
+              }, 2000);
           this.getTasks();
         }); 
     }
 }
 }
 </script>
+<style>
+.logo:hover{
+  transform: scale(1.2);
+}
+</style>
