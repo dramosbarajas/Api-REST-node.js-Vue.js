@@ -1,11 +1,7 @@
 <template>
     <v-app>
 <div>
-  <v-toolbar class="deep-purple lighten-2"> 
-    <v-toolbar-title class="title">Aplicación de Tareas</v-toolbar-title>
-    <v-spacer></v-spacer>
-    <a href="https://github.com/dramosbarajas/Api-REST-node.js-Vue.js"><img class="logo" src="img/github.png" alt="Github"></a>
-  </v-toolbar>
+      <header-component></header-component>
   <div>
   <v-alert
       v-model="alerts.alertSuccess"
@@ -76,6 +72,12 @@
               <span class="grey--text">Tarea  {{index + 1}}</span><br>
               <span>{{ task.title }}</span><br>
               <span>{{ task.description }}</span><br>
+              <v-btn v-if="task.completed" color="primary" fab outline small dark>
+              <v-icon>done</v-icon>
+            </v-btn>
+            <v-btn v-if="!task.completed" color="primary" fab outline small dark>
+              <v-icon>cancel</v-icon>
+            </v-btn>
             </div>
           </v-card-title>
             <hr>

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const path = require("path");
 
 //SETTINGS 
 //Si no existe un puerto en las variables de enviroment utiliza el puerto 3000.
@@ -14,9 +15,10 @@ app.use(express.json());
 
 //ROUTES
 app.use('/api',require("./routes/task"))
+app.use('',require("./routes/app"))
+
 //Static files
 app.use(express.static(__dirname + '/public'))
-
 //CONNECT DB AND SERVER LISTENING 
 mongoose.connect(`mongodb://localhost:${app.get('dbport')}/mevn-database`)
     .then(db => app.listen(app.get('port'), () => {

@@ -4,6 +4,9 @@ import 'vuetify/dist/vuetify.min.css'
 Vue.use(Vuetify)
 import App from './components/App.vue';
 import colors from 'vuetify/es5/util/colors'
+import Header from './components/header.vue'
+
+Vue.component('headerComponent', Header)
 
 Vue.use(Vuetify, {
   theme: {
